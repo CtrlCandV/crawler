@@ -9,7 +9,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 print('程序启动........')
 print('江苏科技大学学子可以使用本程序免费下载知网的PDF文件。')
-print('程序版本号：V1.0\n开发者:无名\n声明：\n本程序为开源项目，绝不盗取任何用户信息，详细代码请访问下面的链接查看')
+print('程序版本号：V1.1\n开发者:无名\n声明：\n本程序为开源项目，绝不盗取任何用户信息，详细代码请访问下面的链接查看')
 print('网址：https://github.com/CtrlCandV/crawler/tree/master/JUST')
 print("本程序的开发与使用不触犯任何法律规定\n本程序的开发与使用不危害任何组织和个人的网络安全\n本程序的开发与使用不侵犯任何组织和个人的版权与合法权益")
 print('详细法律声明与程序行为描述请见上述网址。')
@@ -120,7 +120,7 @@ try:
     pat_value6='<title>(.*?)</title>'
     value6=str(re.compile(pat_value6,re.S).findall(data6)[0])
 
-
+    print('获取知网链接时，请保证在知网是未登录状态')
     openurl=str(input("请输入知网链接（命令行界面中鼠标右键为粘贴）:")).split('://')[1]
     print('开始构建请求地址.......')
     url='https://vpn.just.edu.cn/'
@@ -149,7 +149,8 @@ try:
 
     patName='<title>(.*?)</title>'
     print('开始获取标题......')
-    name=str(re.compile(patName,re.S).findall(data7)[0]).replace('\t','').replace('\n','').replace('\r','').replace(' ','').replace('-中国知网','')
+    name=str(re.compile(patName,re.S).findall(data7)[0]).replace('\t','').replace('\n','').replace('\r','').replace(' ','').replace('-中国知网','').replace('/','')
+    name=name.replace('\\','').replace(':','').replace('*','').replace('?','').replace('"','').replace('<','').replace('>','').replace('|','')
     print('标题获取成功，标题为：'+name)
 
     localfile="./"+name+".pdf"
@@ -159,6 +160,7 @@ try:
     print('文件下载成功，文件保存在该程序所在的目录下。')
 except Exception as err:
     print(err)
+    print('\n\n遇到错误请访问https://github.com/CtrlCandV/crawler/tree/master/JUST，确认最新版是否解决该问题。\n\n')
 finally:
     print('开始退出登录。')
     url='https://vpn.just.edu.cn/dana-na/auth/logout.cgi'
