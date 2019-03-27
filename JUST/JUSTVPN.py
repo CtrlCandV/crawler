@@ -4,20 +4,22 @@ import random
 import time
 import re
 import ssl
+import qrcode
 ssl._create_default_https_context = ssl._create_unverified_context
 
 print('程序启动........')
 print('江苏科技大学学子可以使用本程序免费下载知网的PDF文件。')
 print('程序版本号：V1.0\n开发者:无名\n声明：\n本程序为开源项目，绝不盗取任何用户信息，详细代码请访问下面的链接查看')
-print('网址：')
+print('网址：https://github.com/CtrlCandV/crawler/tree/master/JUST')
 print("本程序的开发与使用不触犯任何法律规定\n本程序的开发与使用不危害任何组织和个人的网络安全\n本程序的开发与使用不侵犯任何组织和个人的版权与合法权益")
 print('详细法律声明与程序行为描述请见上述网址。')
 print('对于恶意侵犯本程序与本人的名誉权的行为，编纂谣言抹黑程序行为的行为，本人依法保留追诉的权利。')
 print('恶意篡改本程序，进行危害网络与用户安全的行为，依法保留追诉的权利，且造成的损失由篡改者承担。')
 print('本程序欢迎同学改进，但是请标明出处，改进所造成的安全问题，由改进人承担，且不得用于商用。')
-print('商用本程序需获得书面授权，未经授权私自以引用、抄袭等行为商用的，依法保留追诉的权利。')
+print('商用本程序或部分源码需获得书面授权，未经授权私自以引用、抄袭等行为商用的，依法保留追诉的权利。')
 print('出售本程序及个人学号密码是违法行为，所造成的任何处罚与损失，由出售者承担。')
-print('如您同意以上条款，可继续使用本程序，否则请退出。\n')
+print('如您同意以上条款，可继续使用本程序，否则请退出。')
+print('程序使用教程也可以访问上述网址查看。\n')
 
 user=str(input('请输入学号：'))
 passwd=str(input('请输入密码（默认为身份证号后六位）:'))
@@ -57,7 +59,7 @@ try:
     req=urllib.request.urlopen(req)
     requrl=req.geturl()
     reqdata=req.read().decode("utf-8","ignore")
-    if 'welcome' in requrl:
+    if 'welcome.cgi?p=user-confirm' in requrl:
         print('您已在其他浏览器登录，即将帮您退出。')
         pat_logagin='name="FormDataStr" value="(.*?)">'
         logagin=str(re.compile(pat_logagin,re.S).findall(reqdata)[0])
@@ -69,6 +71,9 @@ try:
         req= urllib.request.Request(url,postdata)
         req=urllib.request.urlopen(req)
         print('继续会话成功。')
+    elif 'welcome.cgi?p=failed' in requrl:
+        print('学号或密码输入错误，程序退出。')
+        raise Exception("学号或密码错误")
 
     try:
         #发送检查yes信息，并获取xsauth信息
@@ -149,7 +154,7 @@ try:
 
     localfile="./"+name+".pdf"
     print('开始下载文件')
-    print('存在低概率的下载好的文件损坏的可能，可以尝试重新下载。若多次仍然损坏，可能是知网存储的文件就是损坏的。')
+    print('存在低概率的下载好的文件损坏的可能，可以尝试重新下载。若多次仍然损坏，可能是知网存储的文件就是损坏的。\n')
     urllib.request.urlretrieve(url,filename=localfile)
     print('文件下载成功，文件保存在该程序所在的目录下。')
 except Exception as err:
@@ -161,8 +166,14 @@ finally:
     pat_out='<title>(.*?)</title>'
     logoutVal=str(re.compile(pat_out,re.S).findall(logout)[0])
     if 'Logout' in logoutVal:
-        print('退出成功。')
+        print('退出成功。\n\n')
     else:
-        print('退出失败。')
+        print('退出失败。\n\n')
     print('power by 无名 zsl_email@qq.com')
-    input('键入回车退出')
+    end=input('直接回车退出，输入1支付宝资助我，输入2微信资助我:\n\n')
+    if end=='1':
+        img = qrcode.make("https://render.alipay.com/p/s/i?scheme=%61%6C%69%70%61%79%73%3A%2F%2F%70%6C%61%74%66%6F%72%6D%61%70%69%2F%73%74%61%72%74%61%70%70%3F%73%61%49%64%3D%31%30%30%30%30%30%30%37%26%71%72%63%6F%64%65%3D%25%34%38%25%35%34%25%35%34%25%35%30%25%35%33%25%33%41%25%32%46%25%32%46%25%35%31%25%35%32%25%32%45%25%34%31%25%34%43%25%34%39%25%35%30%25%34%31%25%35%39%25%32%45%25%34%33%25%34%46%25%34%44%25%32%46%25%34%36%25%34%42%25%35%38%25%33%30%25%33%38%25%33%37%25%33%33%25%33%36%25%34%38%25%33%38%25%35%35%25%35%34%25%35%35%25%34%44%25%34%42%25%34%34%25%34%43%25%34%46%25%34%38%25%35%34%25%33%33%25%34%32%25%33%46%25%35%46%25%37%33%25%33%44%25%37%37%25%36%35%25%36%32%25%32%44%25%36%46%25%37%34%25%36%38%25%36%35%25%37%32")
+        img.get_image().show()
+    elif end=='2':
+        img = qrcode.make("wxp://f2f0GA69ywUnHUTYXv4GngBHn6BVlOwYs5gD")
+        img.get_image().show()
