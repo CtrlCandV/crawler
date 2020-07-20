@@ -1,6 +1,3 @@
----
-typora-root-url: ./
----
 
 # 桃*族网站爬取器
 
@@ -20,7 +17,7 @@ typora-root-url: ./
 
 ## 三、程序结构
 
-​		<img src="/程序结构.png" alt="程序结构" style="zoom:67%;" />
+​		<img src="./程序结构.png" alt="程序结构" style="zoom:67%;" />
 
 ## 四、使用方法
 
