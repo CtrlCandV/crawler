@@ -130,12 +130,13 @@ class getTwoList(object):
                             try:
                                 self.__sql.uploadTwoList(sqlData)
                             except Exception as err:
-                                error=(True,str(err))
+                                if "for key 'PRIMARY'" not in str(err):
+                                    error=(True,str(err))
                     except Exception as err:
                         error=(True,str(err))
             except Exception as err:
                 error=(True,str(err))
-            if error[0]:
+            if error[0] :
                 print('存在错误，样例：'+error[-1])
     def close(self):
         self.__sql.close()
