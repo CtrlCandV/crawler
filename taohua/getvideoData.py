@@ -18,8 +18,8 @@ class getvideoData(object):
             '详情ID':['//td[@class="t_f"]/@id'],
             '详情':['//*[@id="%s"]/text()'],
             'img':['//*[@id="%s"]//img/@file','//div[@class="pattl"]//img/@zoomfile'],
-            '下载名':['//div[@class="pattl"]//a[@target="_blank"]/text()'],
-            '下载链接':['//div[@class="pattl"]//a[@target="_blank"]/@href']
+            '下载名':['//div[@class="pattl"]//a[@target="_blank"]/text()','//td[@id="%s"]//a[@target="_blank"]/text()'],
+            '下载链接':['//div[@class="pattl"]//a[@target="_blank"]/@href','//td[@id="%s"]//a[@target="_blank"]/@href']
         }
         self.__reStr={
             '':[""]
@@ -86,8 +86,9 @@ class getvideoData(object):
                     xiangqingID=str(self.__getXpathData('详情ID',html,isList=False))
                     xiangqing=str(self.__getXpathData('详情',html,isList=True,isPinjie=True,Pinjie=xiangqingID))
                     img=self.__getXpathData('img',html,isList=True,isPinjie=True,Pinjie=xiangqingID)
-                    donloadText=self.__getXpathData('下载名',html,isList=True)
-                    donloadUrl=self.__getXpathData('下载链接',html,isList=True)
+                    donloadText=self.__getXpathData('下载名',html,isList=True,isPinjie=True,Pinjie=xiangqingID)
+                    donloadUrl=self.__getXpathData('下载链接',html,isList=True,isPinjie=True,Pinjie=xiangqingID)
+
                     donload={}
                     if len(donloadText)==len(donloadUrl):
                         for num in range(0,len(donloadUrl)):
@@ -115,7 +116,7 @@ class getvideoData(object):
 
 
                     #(id,一级分类,二级分类,名称,介绍,str(图片链接列表),str(下载字典),1)
-                    end=(str(videoId),str(videoClass),str(class2Data),str(nameData),str(json.dumps(xiangqing)),str(json.dumps(img)),str(json.dumps(donload)),1)
+                    end=(self.__unicodeChange(videoId),self.__unicodeChange(videoClass),self.__unicodeChange(class2Data),self.__unicodeChange(nameData),self.__unicodeChange(json.dumps(xiangqing)),self.__unicodeChange(json.dumps(img)),self.__unicodeChange(json.dumps(donload)),1)
                     self.__sql.insertVideoData(end)
                     self.__sql.setWaitScanUrlUsed(videoId)
                 except Exception as err:
@@ -180,3 +181,11 @@ class getvideoData(object):
                     data=data[:-1]
                     isOk=True
         return data
+    def __unicodeChange(self,strData):
+        '''
+        对字符串中的Unicode字符进行解码
+        '''
+        now=str(strData)
+        if '\\u' in now:
+            now=str(str(strData).encode('utf8').decode('unicode_escape'))
+        return now
