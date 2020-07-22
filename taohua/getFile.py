@@ -147,8 +147,11 @@ class getFile(object):
         '''
         fileData='影片名称：'+data[3]+'\n'
         introduce=json.loads(data[4])
-        for i in introduce:
-            fileData=fileData+str(i)+'\n'
+        if type(introduce)==type([]):
+            for i in introduce:
+                fileData=fileData+str(i)+'\n'
+        else:
+            fileData=fileData+str(introduce)+'\n'
         fileData=fileData[:-1]
         return fileData
     def __writeFileData(self,data,way):
