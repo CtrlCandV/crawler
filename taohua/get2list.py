@@ -11,7 +11,15 @@ class getTwoList(object):
             '亚洲无码':'forum-181-%s.html',
             '亚洲有码':'forum-220-%s.html',
             '国内原创':'forum-69-%s.html',
-            '蓝光原盘':'forum-177-%s.html'
+            '蓝光原盘':'forum-177-%s.html',
+            '资源合集':'forum-203-%s.html',
+            '性爱自拍图片':'forum-42-%s.html',
+            '人体艺术图片':'forum-51-%s.html',
+            '街头抓拍':'forum-57-%s.html',
+            '欧美图片':'forum-221-%s.html',
+            'AV美图':'forum-239-%s.html',
+            '动态图区':'forum-200-%s.html',
+            '漫画':'forum-307-%s.html'
         }
 
         if url[-1]=='/':
