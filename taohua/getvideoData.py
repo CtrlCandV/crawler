@@ -117,8 +117,10 @@ class getvideoData(object):
                     for iimg in img:
                         if iimg[0]=='/':
                             imgList.append(self.__url+iimg[1:])
+                        else:
+                            imgList.append(iimg)
                     img=imgList
-                    
+
                     #(id,一级分类,二级分类,名称,介绍,str(图片链接列表),str(下载字典),1)
                     end=(self.__unicodeChange(videoId),self.__unicodeChange(videoClass),self.__unicodeChange(class2Data),self.__unicodeChange(nameData),self.__unicodeChange(json.dumps(xiangqing)),self.__unicodeChange(json.dumps(img)),self.__unicodeChange(json.dumps(donload)),1)
                     self.__sql.insertVideoData(end)
