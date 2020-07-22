@@ -84,7 +84,7 @@ class getvideoData(object):
                     class2Data=self.__getXpathData('二级分类',html)
                     nameData=self.__getXpathData('名称',html)
                     xiangqingID=str(self.__getXpathData('详情ID',html,isList=False))
-                    xiangqing=str(self.__getXpathData('详情',html,isList=True,isPinjie=True,Pinjie=xiangqingID))
+                    xiangqing=list(self.__getXpathData('详情',html,isList=True,isPinjie=True,Pinjie=xiangqingID))
                     img=self.__getXpathData('img',html,isList=True,isPinjie=True,Pinjie=xiangqingID)
                     donloadText=self.__getXpathData('下载名',html,isList=True,isPinjie=True,Pinjie=xiangqingID)
                     donloadUrl=self.__getXpathData('下载链接',html,isList=True,isPinjie=True,Pinjie=xiangqingID)
@@ -112,8 +112,6 @@ class getvideoData(object):
                         else:
                             if now[-1] in self.__badList:
                                 donload.pop(i)
-
-
 
                     #(id,一级分类,二级分类,名称,介绍,str(图片链接列表),str(下载字典),1)
                     end=(self.__unicodeChange(videoId),self.__unicodeChange(videoClass),self.__unicodeChange(class2Data),self.__unicodeChange(nameData),self.__unicodeChange(json.dumps(xiangqing)),self.__unicodeChange(json.dumps(img)),self.__unicodeChange(json.dumps(donload)),1)
