@@ -88,6 +88,11 @@ class getvideoData(object):
                     img=self.__getXpathData('img',html,isList=True,isPinjie=True,Pinjie=xiangqingID)
                     donloadText=self.__getXpathData('下载名',html,isList=True,isPinjie=True,Pinjie=xiangqingID)
                     donloadUrl=self.__getXpathData('下载链接',html,isList=True,isPinjie=True,Pinjie=xiangqingID)
+                    
+                    nowxiangqing=[]
+                    for i in xiangqing:
+                        nowxiangqing=str(i).replace('"','\\"').replace('\\','\\\\')
+                    xiangqing=nowxiangqing
 
                     donload={}
                     if len(donloadText)==len(donloadUrl):
