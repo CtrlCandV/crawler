@@ -101,9 +101,9 @@ class getFile(object):
                         self.__downTorr(down,way)
                         self.__sql.setWaitDownloadUsed(data[0])
                     except Exception as ierr:
-                        print(str(data[0])+str(ierr))
+                        print(str(data[0])+'发生错误'+str(ierr))
             except Exception as err:
-                print(err)
+                print('下载大循环错误'+str(err))
 
     def __createDir(self,way):
         '''
@@ -162,7 +162,7 @@ class getFile(object):
             f=open(way,mode='w')
             f.write(data)
         except Exception as err:
-            print(err)
+            print('文件写入错误'+str(err))
         finally:
             try:
                 f.close()
@@ -189,21 +189,21 @@ class getFile(object):
         '''
         fileName=list(down.keys())
         url='http://thzd.cc/forum.php?mod=attachment&aid=%s'
-        order='wget "%s" -O "%s"'
+        order='wget -q "%s" -O "%s"'
         for name in fileName:
             try:
                 fileId=down[name].split('=')[-1]
                 nowUrl=url%(fileId)
                 fileWay=self.__addDirWay(way,name,isFile=True)
                 nowOrder=order%(nowUrl,fileWay)
-                a=os.popen(nowOrder).read()
+                os.popen(nowOrder).read()
             except Exception as err:
-                print(err)
+                print('下载种子文件错误'+str(err))
     def __downImg(self,imgList,way):
         '''
         下载图片
         '''
-        order='wget "%s" -O "%s"'
+        order='wget -q "%s" -O "%s"'
         num=0
         for img in imgList:
             try:
@@ -211,6 +211,6 @@ class getFile(object):
                 fileName=str(num)+'.jpg'
                 fileWay=self.__addDirWay(way,fileName,isFile=True)
                 nowOrder=order%(img,fileWay)
-                a=os.popen(nowOrder).read()
+                os.popen(nowOrder).read()
             except Exception as err:
-                print(err)
+                print('下载图片错误'+str(err))
