@@ -55,7 +55,7 @@ class sql(object):
         num代表单次获的页面数量
         '''
         endList=[]
-        getWaitListSQL='select videoClass,id,url,used from twoList where used=1 limit 1,%s;'
+        getWaitListSQL='select videoClass,id,url,used from twoList where used=1 limit 0,%s;'
         self.cursor.execute(getWaitListSQL,num)
         anser=self.cursor.fetchall()
         for i in anser:
