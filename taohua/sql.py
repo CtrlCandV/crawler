@@ -117,3 +117,37 @@ class sql(object):
         setWaitScanUrlUsedSQL='update videoData set isUsed=0 where id=%s;'
         self.cursor.execute(setWaitScanUrlUsedSQL,str(videoId))
         self.db.commit()
+
+    def getDownNum(self):
+        '''
+        获取已经下载的视频资料数目
+        '''
+        setWaitScanUrlUsedSQL='select count(*) from videoData where isUsed=0;'
+        self.cursor.execute(setWaitScanUrlUsedSQL)
+        try:
+            anser=self.cursor.fetchall()[0][0]
+        except Exception:
+            return False
+        return anser
+    def getAllDownNum(self):
+        '''
+        获取全部的视频资料数目
+        '''
+        setWaitScanUrlUsedSQL='select count(*) from videoData;'
+        self.cursor.execute(setWaitScanUrlUsedSQL)
+        try:
+            anser=self.cursor.fetchall()[0][0]
+        except Exception:
+            return False
+        return anser
+    def getAllUrlNum(self):
+        '''
+        获取全部的视频链接数目
+        '''
+        setWaitScanUrlUsedSQL='select count(*) from twoList;'
+        self.cursor.execute(setWaitScanUrlUsedSQL)
+        try:
+            anser=self.cursor.fetchall()[0][0]
+        except Exception:
+            return False
+        return anser
