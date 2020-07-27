@@ -103,7 +103,7 @@ class sql(object):
         num代表单次获的页面数量
         '''
         endList=[]
-        getWaitListSQL='select id,videoClass,videoClass2,name,introduce,img,donload from videoData where isUsed=1 limit 1,%s;'
+        getWaitListSQL='select id,videoClass,videoClass2,name,introduce,img,donload from videoData where isUsed=1 limit 0,%s;'
         self.cursor.execute(getWaitListSQL,num)
         anser=self.cursor.fetchall()
         for i in anser:
