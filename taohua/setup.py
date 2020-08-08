@@ -42,7 +42,7 @@ host=input('请输入mysql数据库的地址，直接回车默认为localhost:')
 if len(host)==0:
     host='localhost'
 user=input('请输入mysql数据库的用户名，直接回车默认为root:')
-if len(host)==0:
+if len(user)==0:
     user='root'
 password=input('请输入mysql数据库的密码:')
 
