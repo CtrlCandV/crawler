@@ -2,19 +2,19 @@ import sql,os,json
 
 class getFile(object):
     def __init__(self,url,baseWay='./videoData/'):
-        self.header=[
-            "Host: thzd.cc",
-            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0",
-            "Accept: */*",
-            "Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-            "Connection: keep-alive",
-            "Referer: http://thzd.cc/thread-2210542-1-1.html",
-            "Cookie: WMwh_2132_saltkey=Pc84lF2l; WMwh_2132_lastvisit=1593879552; Hm_lvt_acfaccaaa388521ba7e29a5e15cf85ad=1593884505,1595118229; UM_distinctid=1731aeb75224d8-0918a33cff8d2f-4c302372-190140-1731aeb75233e7; CNZZDATA1254190848=850755625-1593883578-http%253A%252F%252Ft.thzdz3.com%252F%7C1595136784; HstCfa2810755=1593884514758; HstCla2810755=1595137337255; HstCmu2810755=1593884514758; HstPn2810755=6; HstPt2810755=15; HstCnv2810755=5; HstCns2810755=7; __dtsu=104015938845196792DC0326EFAD3B81; yunsuo_session_verify=374de42a941f4021e9425d6c4481a451; WMwh_2132_lastact=1595135970%09home.php%09misc; Hm_lpvt_acfaccaaa388521ba7e29a5e15cf85ad=1595137336; WMwh_2132_st_t=0%7C1595135276%7C2b676ce3aac1724b687b5e5a8ec429d2; WMwh_2132_forum_lastvisit=D_181_1595134940D_182_1595135276; WMwh_2132_secqaa=169413.86b1adf16d34cbe219; WMwh_2132_st_p=0%7C1595135968%7C11ad8111c91c877b32822a8303d520af; WMwh_2132_viewid=tid_1000004"
-        ]
         if url[-1]=='/':
             self.__url=url
         else:
             self.__url=url+'/'
+        self.host=self.__url.replace('http://','').replace('https://','').split('/')[0]
+        self.header=[
+            "Host: "+self.host,
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0",
+            "Accept: */*",
+            "Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+            "Connection: keep-alive",
+            "Referer: http://"+self.host+"/forum.php"
+        ]
         if baseWay[-1]=='/':
             self.__baseWay=baseWay
         else:
@@ -189,9 +189,11 @@ class getFile(object):
         '''
         fileName=list(down.keys())
         url='http://thzd.cc/forum.php?mod=attachment&aid=%s'
-        order='wget -q "%s" -O "%s"'
+        order='wget --timeout=10 --tries=3 -q "%s" -O "%s"'
         for name in fileName:
             try:
+                if 'torr' not in name and 'TORR' not in name:
+                    continue
                 fileId=down[name].split('=')[-1]
                 nowUrl=url%(fileId)
                 fileWay=self.__addDirWay(way,name,isFile=True)
@@ -203,12 +205,15 @@ class getFile(object):
         '''
         下载图片
         '''
-        order='wget -q "%s" -O "%s"'
+        order='wget --timeout=10 --tries=3 -q "%s" -O "%s"'
         num=0
         for img in imgList:
             try:
                 num=num+1
-                fileName=str(num)+'.jpg'
+                if img.split('.')[-1]=='gif' or img.split('.')[-1]=='GIF':
+                    fileName=str(num)+'.gif'
+                else:
+                    fileName=str(num)+'.jpg'
                 fileWay=self.__addDirWay(way,fileName,isFile=True)
                 nowOrder=order%(img,fileWay)
                 os.popen(nowOrder).read()
