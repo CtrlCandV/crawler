@@ -58,6 +58,7 @@ class sql(object):
         getWaitListSQL='select videoClass,id,url,used from twoList where used=1 limit 0,%s;'
         self.cursor.execute(getWaitListSQL,num)
         anser=self.cursor.fetchall()
+        self.db.commit()
         for i in anser:
             endList.append(i)
         return endList
@@ -106,6 +107,7 @@ class sql(object):
         getWaitListSQL='select id,videoClass,videoClass2,name,introduce,img,donload from videoData where isUsed=1 limit 0,%s;'
         self.cursor.execute(getWaitListSQL,num)
         anser=self.cursor.fetchall()
+        self.db.commit()
         for i in anser:
             endList.append(i)
         return endList
@@ -126,6 +128,7 @@ class sql(object):
         self.cursor.execute(setWaitScanUrlUsedSQL)
         try:
             anser=self.cursor.fetchall()[0][0]
+            self.db.commit()
         except Exception:
             return False
         return anser
@@ -137,6 +140,7 @@ class sql(object):
         self.cursor.execute(setWaitScanUrlUsedSQL)
         try:
             anser=self.cursor.fetchall()[0][0]
+            self.db.commit()
         except Exception:
             return False
         return anser
@@ -148,6 +152,7 @@ class sql(object):
         self.cursor.execute(setWaitScanUrlUsedSQL)
         try:
             anser=self.cursor.fetchall()[0][0]
+            self.db.commit()
         except Exception:
             return False
         return anser
