@@ -90,15 +90,16 @@ class getFile(object):
             try:
                 for data in self.__waitData:
                     try:
-                        way=self.__getDirWay(data)
-                        self.__createDir(way)
-                        fileData=self.__getFileData(data)
-                        fileWay=self.__addDirWay(way,self.__fileName,isFile=True)
-                        self.__writeFileData(fileData,fileWay)
                         img=self.__getImgList(data)
                         down=self.__getDownLoad(data)
-                        self.__downImg(img,way)
-                        self.__downTorr(down,way)
+                        if len(img)>0 or len(down)>0:
+                            way=self.__getDirWay(data)
+                            self.__createDir(way)
+                            fileData=self.__getFileData(data)
+                            fileWay=self.__addDirWay(way,self.__fileName,isFile=True)
+                            self.__writeFileData(fileData,fileWay)
+                            self.__downImg(img,way)
+                            self.__downTorr(down,way)
                         self.__sql.setWaitDownloadUsed(data[0])
                     except Exception as ierr:
                         print(str(data[0])+'发生错误'+str(ierr))
@@ -146,7 +147,10 @@ class getFile(object):
         
         '''
         fileData='影片名称：'+data[3]+'\n'
-        introduce=json.loads(data[4])
+        try:
+            introduce=json.loads(data[4])
+        except Exception:
+            introduce=str(data[4])
         if type(introduce)==type([]):
             for i in introduce:
                 fileData=fileData+str(i)+'\n'
