@@ -192,7 +192,7 @@ class getFile(object):
         下载种子文件
         '''
         fileName=list(down.keys())
-        url='http://thzd.cc/forum.php?mod=attachment&aid=%s'
+        url='http://'+str(self.host)+'/forum.php?mod=attachment&aid=%s'
         order='wget --timeout=10 --tries=3 -q "%s" -O "%s"'
         for name in fileName:
             try:
