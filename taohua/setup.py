@@ -96,7 +96,7 @@ try:
             elif i=='badUrlList':
                 order='create table badUrlList(url varchar(500) not null PRIMARY KEY,id varchar(200) not null,isUsed int(1) not null)DEFAULT CHARSET=utf8;'
             elif i=='fileMD5':
-                order='create table fileMD5(fileWay varchar(500) not null,MD5 varchar(200) not null PRIMARY KEY)DEFAULT CHARSET=utf8;'
+                order='create table fileMD5(fileWay varchar(500) not null,MD5Num varchar(200) not null PRIMARY KEY)DEFAULT CHARSET=utf8;'
             else:
                 order='create table badLikeList(data varchar(500) not null PRIMARY KEY,isUsed int(1) not null)DEFAULT CHARSET=utf8;'
             cursor.execute(order)
