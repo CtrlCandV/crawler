@@ -69,7 +69,7 @@ try:
     print('开始检查数据表是否存在')
     cursor.execute('show tables;')
     anser=cursor.fetchall()
-    now=['twoList','videoData']
+    now=['twoList','videoData','badUrlList','badLikeList','fileMD5']
     data=[]
     for i in anser:
         if len(i)>0:
@@ -77,6 +77,12 @@ try:
                 data.append('twoList')
             elif i[0]=='videodata':
                 data.append('videoData')
+            elif i[0]=='badurllist':
+                data.append('badUrlList')
+            elif i[0]=='badlikelist':
+                data.append('badLikeList')
+            elif i[0]=='fileMD5':
+                data.append('fileMD5')
             data.append(i[0])
     for i in now:
         print('开始检查数据表%s是否存在'%(i))
@@ -85,8 +91,14 @@ try:
             print('数据表%s不存在，开始创建'%(i))
             if i=='twoList':
                 order='create table twoList(videoClass varchar(30) not null,id varchar(200) not null PRIMARY KEY,url varchar(200) not null,used int(1) not null)DEFAULT CHARSET=utf8;'
-            else:
+            elif i=='videoData':
                 order='create table videoData(id varchar(200) not null PRIMARY KEY,videoClass varchar(30) not null,videoClass2 varchar(30),name varchar(500) not null,introduce TEXT,img TEXT,donload TEXT,isUsed int(1))DEFAULT CHARSET=utf8;'
+            elif i=='badUrlList':
+                order='create table badUrlList(url varchar(500) not null PRIMARY KEY,id varchar(200) not null,isUsed int(1) not null)DEFAULT CHARSET=utf8;'
+            elif i=='fileMD5':
+                order='create table fileMD5(fileWay varchar(500) not null,MD5 varchar(200) not null PRIMARY KEY)DEFAULT CHARSET=utf8;'
+            else:
+                order='create table badLikeList(data varchar(500) not null PRIMARY KEY,isUsed int(1) not null)DEFAULT CHARSET=utf8;'
             cursor.execute(order)
             print('数据表%s创建成功'%(i))
         else:
