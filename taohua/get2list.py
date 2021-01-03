@@ -1,8 +1,8 @@
-import re,requests,sql
+import re,requests,sql,os
 from lxml import etree
 
 class getTwoList(object):
-    def __init__(self,url):
+    def __init__(self,url,config='config',proxy=(False,'127.0.0.1',0)):
         '''
         该class是为了获取二级下的列表详情
         如 亚洲无码、欧美无码下有哪些页面
@@ -10,10 +10,14 @@ class getTwoList(object):
         self.__webList={
             '亚洲无码':'forum-181-%s.html',
             '亚洲有码':'forum-220-%s.html',
+            '欧美无码':'forum-182-%s.html',
             '国内原创':'forum-69-%s.html',
+            '三级电影':'forum-73-%s.html',
             '蓝光原盘':'forum-177-%s.html',
             '资源合集':'forum-203-%s.html',
+            '热门电影':'forum-196-%s.html',
             '性爱自拍图片':'forum-42-%s.html',
+            '美图写真':'forum-137-%s.html',
             '人体艺术图片':'forum-56-%s.html',
             '街头抓拍':'forum-57-%s.html',
             '欧美图片':'forum-221-%s.html',
@@ -26,12 +30,19 @@ class getTwoList(object):
             self.__url=url
         else:
             self.__url=url+'/'
+        
+        self.__proxy=proxy
+        self.__proxyDict={
+            "http":"http://"+self.__proxy[1]+':'+str(self.__proxy[2])+'/',
+            "https":"https://"+self.__proxy[1]+':'+str(self.__proxy[2])+'/',
+        }
+
         self.host=self.__url.replace('http://','').replace('https://','').split('/')[0]
         self.__nowJod=list(self.__webList.keys())[0]
         self.__nowJodUrl=self.__url+self.__webList[self.__nowJod]
         self.__deep=-1
         self.__session = requests.session()
-        self.__sql=sql.sql()
+        self.__sql=sql.sql(config=config)
         
     def getAllClassName(self):
         '''
@@ -168,7 +179,10 @@ class getTwoList(object):
             "Cache-Control":"max-age=0"
         }
         url=self.__nowJodUrl%(str(num))
-        r=self.__session.get(url,headers=header,timeout=15,verify=False)
+        if self.__proxy[0]==False:
+            r=self.__session.get(url,headers=header,timeout=15,verify=False)
+        else:
+            r=self.__session.get(url,headers=header,timeout=15,verify=False,proxies=self.__proxyDict)
         return str(r.content,"utf-8")
     def __getBigNum(self,numList):
         '''
