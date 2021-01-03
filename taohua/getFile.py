@@ -1,7 +1,7 @@
-import sql,os,json
+import sql,os,json,hashlib
 
 class getFile(object):
-    def __init__(self,url,baseWay='./videoData/'):
+    def __init__(self,url,baseWay='./videoData/',config='config',proxy=(False,'127.0.0.1',0)):
         if url[-1]=='/':
             self.__url=url
         else:
@@ -22,10 +22,16 @@ class getFile(object):
         
         self.__fileName='介绍.txt'
 
+        self.__proxy=proxy
+        self.__proxyDict={
+            "http":"http://"+self.__proxy[1]+':'+str(self.__proxy[2])+'/',
+            "https":"https://"+self.__proxy[1]+':'+str(self.__proxy[2])+'/',
+        }
+
         self.__waitData=[]
         self.__weiNum=10
 
-        self.__sql=sql.sql()
+        self.__sql=sql.sql(config=config)
     
     def setUrl(self,url):
         '''
@@ -182,7 +188,7 @@ class getFile(object):
         return list(img)
     def __getDownLoad(self,data):
         '''
-        将传入的data数据，转化成img的列表
+        将传入的data数据，转化成种子的字典
         id 0,videoClass 1,videoClass2 2,name 3,introduce 4,img 5,donload 6
         '''
         down=json.loads(data[6])
@@ -193,7 +199,11 @@ class getFile(object):
         '''
         fileName=list(down.keys())
         url='http://'+str(self.host)+'/forum.php?mod=attachment&aid=%s'
-        order='wget --timeout=10 --tries=3 -q "%s" -O "%s"'
+        if self.__proxy[0]==False:
+            order='wget --timeout=10 --tries=3 -q "%s" -O "%s"'
+        else:
+            order='wget -e "http_proxy='+str(self.__proxyDict["http"])+'" --timeout=10 --tries=3 -q "%s" -O "%s"'
+
         for name in fileName:
             try:
                 if 'torr' not in name and 'TORR' not in name:
@@ -202,14 +212,32 @@ class getFile(object):
                 nowUrl=url%(fileId)
                 fileWay=self.__addDirWay(way,name,isFile=True)
                 nowOrder=order%(nowUrl,fileWay)
-                os.popen(nowOrder).read()
+                for i in range(0,3):
+                    os.popen(nowOrder).read()
+                    if self.__checkFileNull(fileWay):
+                        
+                        md5Check=self.__checkFileExist(fileWay)
+                        if md5Check==False:
+                            try:
+                                os.remove(fileWay)
+                            except Exception:
+                                pass
+                        break
+                    else:
+                        try:
+                            os.remove(fileWay)
+                        except Exception:
+                            pass
             except Exception as err:
                 print('下载种子文件错误'+str(err))
     def __downImg(self,imgList,way):
         '''
         下载图片
         '''
-        order='wget --timeout=10 --tries=3 -q "%s" -O "%s"'
+        if self.__proxy[0]==False:
+            order='wget --timeout=10 --tries=3 -q "%s" -O "%s"'
+        else:
+            order='wget -e "http_proxy='+str(self.__proxyDict["http"])+'" --timeout=30 --tries=3 -q "%s" -O "%s"'
         num=0
         for img in imgList:
             try:
@@ -220,6 +248,52 @@ class getFile(object):
                     fileName=str(num)+'.jpg'
                 fileWay=self.__addDirWay(way,fileName,isFile=True)
                 nowOrder=order%(img,fileWay)
-                os.popen(nowOrder).read()
+                for i in range(0,3):
+                    os.popen(nowOrder).read()
+                    if self.__checkFileNull(fileWay):
+                        md5Check=self.__checkFileExist(fileWay)
+                        if md5Check==False:
+                            try:
+                                os.remove(fileWay)
+                            except Exception:
+                                pass
+                        break
+                    else:
+                        try:
+                            os.remove(fileWay)
+                        except Exception:
+                            pass
             except Exception as err:
                 print('下载图片错误'+str(err))
+    
+    def __checkFileNull(self,fileWay):
+        """
+        检查是否为空文件
+        """
+        try:
+            if os.path.getsize(fileWay)==0:
+                return False
+            else:
+                return True
+        except Exception:
+            return False
+    
+    def __checkFileExist(self,fileWay):
+        """
+        检查文件MD5值是否已经存在
+        """
+        md5Str=self.__get_md5_value(fileWay)
+        anser=self.__sql.checkFileMD5(fileWay,md5Str)
+        if anser==True:
+            self.__sql.writeFileMD5(fileWay,md5Str)
+            return True
+        else:
+            return False
+
+    
+    def __get_md5_value(self,filename):
+        md5 = ""
+        with open(filename, 'rb') as f:
+            data = f.read()
+            md5 = hashlib.md5(data).hexdigest()
+        return str(md5)
