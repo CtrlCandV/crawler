@@ -2,11 +2,19 @@ import re,requests,sql,json
 from lxml import etree
 
 class getvideoData(object):
-    def __init__(self,url):
-        self.__sql=sql.sql()
+    def __init__(self,url,config='config',proxy=(False,'127.0.0.1',0)):
+        self.__sql=sql.sql(config=config)
         self.__weiNum=10
         self.__waitUrl=[]
+        self.__badUrlList=['http://thzd.cc/']
         self.__session = requests.session()
+
+        self.__proxy=proxy
+        self.__proxyDict={
+            "http":"http://"+self.__proxy[1]+':'+str(self.__proxy[2])+'/',
+            "https":"https://"+self.__proxy[1]+':'+str(self.__proxy[2])+'/',
+        }
+
         if url[-1]=='/':
             self.__url=url
         else:
@@ -17,7 +25,7 @@ class getvideoData(object):
             '名称':['//*[@id="thread_subject"]/text()'],
             '详情ID':['//td[@class="t_f"]/@id'],
             '详情':['//*[@id="%s"]/text()'],
-            'img':['//*[@id="%s"]//img/@file','//div[@class="pattl"]//img/@zoomfile','/html/body/div[7]/div[4]/div[2]/div[1]/table/tbody/tr[1]/td[2]/div[2]/div/div[1]/table/tbody/tr/td/img/@src'],
+            'img':['//*[@id="%s"]//img/@file','//div[@class="pattl"]//img/@zoomfile','/html/body/div[7]/div[4]/div[2]/div[1]/table/tbody/tr[1]/td[2]/div[2]/div/div[1]/table/tbody/tr/td/img/@src',"//img[starts-with(@id, 'aimg_')]/@file"],
             '下载名':['//div[@class="pattl"]//a[@target="_blank"]/text()','//td[@id="%s"]//a[@target="_blank"]/text()'],
             '下载链接':['//div[@class="pattl"]//a[@target="_blank"]/@href','//td[@id="%s"]//a[@target="_blank"]/@href']
         }
@@ -81,6 +89,8 @@ class getvideoData(object):
                     anser=self.__getPage(videoUrl)
                     html = etree.HTML(anser)
                     
+                    badLikeDataList=self.__sql.getBadLikeData()
+
                     class2Data=self.__getXpathData('二级分类',html)
                     nameData=self.__getXpathData('名称',html)
                     xiangqingID=str(self.__getXpathData('详情ID',html,isList=False))
@@ -123,8 +133,25 @@ class getvideoData(object):
                         if iimg[0]=='/':
                             imgList.append(self.__url+iimg[1:])
                         else:
-                            imgList.append(iimg)
+                            nowiimg=iimg
+                            for badUrl in self.__badUrlList:
+                                if badUrl in iimg:
+                                    nowiimg=str(nowiimg).replace(badUrl,self.__url)
+                            imgList.append(nowiimg)
                     img=imgList
+
+                    #检查是否为垃圾图片链接
+                    imgList=[]
+                    for iimg in img:
+                        ispass=True
+                        if self.__sql.checkBadUrl(iimg):
+                            for badLike in badLikeDataList:
+                                if badLike in iimg:
+                                    ispass=False
+                            if ispass:
+                                imgList.append(iimg)
+                    img=imgList
+
 
                     #(id,一级分类,二级分类,名称,介绍,str(图片链接列表),str(下载字典),1)
                     end=(self.__unicodeChange(videoId),self.__unicodeChange(videoClass),self.__unicodeChange(class2Data),self.__unicodeChange(nameData),self.__unicodeChange(json.dumps(xiangqing)),self.__unicodeChange(json.dumps(img)),self.__unicodeChange(json.dumps(donload)),1)
@@ -177,7 +204,10 @@ class getvideoData(object):
             "Upgrade-Insecure-Requests":"1",
             "Cache-Control":"max-age=0"
         }
-        r=self.__session.get(url,headers=header,timeout=15,verify=False)
+        if self.__proxy[0]==False:
+            r=self.__session.get(url,headers=header,timeout=15,verify=False)
+        else:
+            r=self.__session.get(url,headers=header,timeout=15,verify=False,proxies=self.__proxyDict)
         return str(r.content,"utf-8")
     def __clearStr(self,data):
         '''
