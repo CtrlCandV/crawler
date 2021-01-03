@@ -1,3 +1,7 @@
+---
+typora-root-url: ./
+
+---
 
 # 桃*族网站爬取器
 
@@ -17,7 +21,7 @@
 
 ## 三、程序结构
 
-​		<img src="./程序结构.png" alt="程序结构" style="zoom:67%;" />
+​		<img src="/程序结构.png" alt="程序结构" style="zoom:67%;" />
 
 ## 四、使用方法
 
@@ -47,6 +51,26 @@ python main.py -u "http://www.baidu.com/"
 
 ```bash
 python main.py -u "http://www.baidu.com/" -d 10
+```
+
+​		如您想要使用代理，请指定http代理的地址，具体方式为：
+
+​			使用***-p***字段,输入1来启用代理模式。
+
+```
+python main.py -p 1
+```
+
+​			在启用代理模式后，您需要指定http(s)代理地址和端口，假设地址为 127.0.0.1 端口为8080
+
+```bash
+python main.py -p 1 --proxyIP “127.0.0.1” --proxyPort 8080
+```
+
+​		综上，完整的含代理请求为：
+
+```bash
+python main.py -p 1 --proxyIP “127.0.0.1” --proxyPort 8080 -u "http://www.baidu.com/" -d 10
 ```
 
 
