@@ -1,8 +1,8 @@
 import pymysql,json
 class sql(object):
-    def __init__(self):
+    def __init__(self,config='config'):
         try:
-            f=open('config',mode='r')
+            f=open(config,mode='r')
             anser=str(f.read())
             anser=json.loads(anser)
         except Exception:
@@ -156,3 +156,120 @@ class sql(object):
         except Exception:
             return False
         return anser
+    
+    def addBadUrl(self,url,tid):
+        '''
+        增加下载链接黑名单
+        '''
+        addBadUrlOrder='insert into badUrlList (id,url,isUsed) values (%s,%s,%s);'
+        error=(False,'')
+        try:
+            self.cursor.execute(addBadUrlOrder,(tid,url,1))
+        except Exception as err:
+            if "PRIMARY" not in str(err):
+                error=(True,str(err))
+        finally:
+            try:
+                self.db.commit()
+            except Exception:
+                pass
+        return error
+    
+    def checkBadUrl(self,url):
+        '''
+        检查下载链接黑名单
+        存在于黑名单，返回False，否则为True
+        '''
+        checkBadUrlOrder='select count(*) from badUrlList where url=%s and isUsed=1;'
+        try:
+            self.cursor.execute(checkBadUrlOrder,(url))
+            anser=self.cursor.fetchall()[0][0]
+            self.db.commit()
+            anser=int(anser)
+            if anser>0:
+                return False
+            else:
+                return True
+        except Exception:
+            return True
+    def getIdData(self,tid):
+        '''
+        获得某个ID的详情
+        '''
+        endList=[]
+        getIdDataSQL='select id,videoClass,videoClass2,name,introduce,img,donload from videoData where id=%s;'
+        self.cursor.execute(getIdDataSQL,tid)
+        anser=self.cursor.fetchall()
+        self.db.commit()
+        for i in anser:
+            endList.append(i)
+        return endList
+    def addBadLikeData(self,data):
+        '''
+        增加下载链接黑名单(相似列表)
+        '''
+        addBadLikeDataOrder='insert into badLikeList (data,isUsed) values (%s,%s);'
+        error=(False,'')
+        try:
+            self.cursor.execute(addBadLikeDataOrder,(data,1))
+        except Exception as err:
+            if "PRIMARY" not in str(err):
+                error=(True,str(err))
+        finally:
+            try:
+                self.db.commit()
+            except Exception:
+                pass
+        return error
+    def getBadLikeData(self):
+        '''
+        获得不良类似链接
+        '''
+        endList=[]
+        getBadDataSQL='select data from badLikeList where isUsed=1;'
+        self.cursor.execute(getBadDataSQL)
+        anser=self.cursor.fetchall()
+        self.db.commit()
+        for i in anser:
+            endList.append(i[0])
+        return endList
+    
+    def checkFileMD5(self,fileWay,MD5Num):
+        """
+        检查MD5值是否存在
+        文件路径存在，则返回True
+        文件路径不存在，MD5值不存在，返回True
+        文件路径不存在，MD5值存在，返回False
+        """
+        #fileWayOrder="select fileWay,MD5Num from fileMD5 where fileWay=%s;"
+        fileMD5Order="select fileWay,MD5Num from fileMD5 where MD5Num=%s;"
+        try:
+            self.cursor.execute(fileMD5Order,(MD5Num))
+            anser=self.cursor.fetchall()
+            self.db.commit()
+            if len(anser)==0:
+                return True
+            else:
+                for i in anser:
+                    if fileWay in i:
+                        return True
+                return False
+        except Exception as err:
+            print ("数据库查询错误")
+            return err
+
+    def writeFileMD5(self,fileWay,MD5Num):
+        """
+        写入MD5值
+        """
+        writeFileMD5SQLOrder="insert into fileMD5(fileWay,MD5Num) values (%s,%s);"
+        try:
+            self.cursor.execute(writeFileMD5SQLOrder,(fileWay,MD5Num))
+            self.db.commit()
+            return True
+        except Exception as err:
+            if "PRIMARY" in str(err) or "primary" in str(err):
+                return True
+            else:
+                print("MD5值写入出错："+str(err))
+                return False
